@@ -28,5 +28,10 @@ namespace ChillLobbyServer
         {
 
         }
+
+        public void UpdateAsync()
+        {
+
+        }
     }
 }
