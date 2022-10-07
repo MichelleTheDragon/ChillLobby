@@ -11,12 +11,12 @@ namespace ChillLobbyServer
             ServerCommands serverCommands = new ServerCommands();
             serverCommands.StartServer();
 
-            Thread InboundThread = new Thread(new ThreadStart(serverCommands.InboundPackages));
+            //Thread InboundThread = new Thread(new ThreadStart(serverCommands.InboundPackages));
             Thread OutboundThread = new Thread(new ThreadStart(serverCommands.OutboundPackages));
             Thread UpdateThread = new Thread(new ThreadStart(serverCommands.UpdateAsync));
             Thread ConsoleCommandsThread = new Thread(new ThreadStart(serverCommands.ConsoleCommands));
 
-            InboundThread.Start();
+            //InboundThread.Start();
             OutboundThread.Start();
             UpdateThread.Start();
             ConsoleCommandsThread.Start();
