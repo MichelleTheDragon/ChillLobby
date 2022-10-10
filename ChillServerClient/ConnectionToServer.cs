@@ -17,12 +17,6 @@ namespace ChillServerClient
         {
             ep = new IPEndPoint(IPAddress.Parse(IpAddress), 11000);
             client.Connect(ep);
-            //try
-            //{
-            //} catch (Exception)
-            //{
-
-            //}
         }
     }
 }

@@ -125,6 +125,8 @@ namespace ChillLobbyServer
                             Console.WriteLine("    Command     |        Example        |       Description");
                             Console.WriteLine("!Help            \"!Help\"                 Shows the list of server commands");
                             Console.WriteLine("!IP              \"!IP\"                   Shows the servers IP address");
+                            Console.WriteLine("!Clients         \"!Clients\"              Shows all clients connected to the server");
+                            Console.WriteLine("!Weather         \"!Weather\"              Shows the current weather");
                             Console.WriteLine("!Msg             \"!Msg Hello World\"      Writes server messages to the clients");
                             Console.WriteLine("!Save            \"!Save World1\"          Creates a save file of the current game state");
                             Console.WriteLine("!Load            \"!Load World1\"          Loads a save file if it exists");
@@ -164,6 +166,9 @@ namespace ChillLobbyServer
                                     Console.WriteLine(i + 1 + "                 " + ((IPEndPoint)(allConnections[i].myConnection.Client.RemoteEndPoint)).ToString() + "        " + allConnections[i].name);
                                 }
                             }
+                            break;
+                        case "!Weather": case "!weather":
+
                             break;
                         case "!Save": case "!save":
                             if (commandText.Length >= 7)
