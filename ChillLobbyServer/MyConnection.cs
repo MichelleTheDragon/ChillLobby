@@ -11,6 +11,8 @@ namespace ChillLobbyServer
     internal class MyConnection
     {
         public TcpClient myConnection;
+        public IPEndPoint myIp;
+        public Player myPlayer;
         //public bool needsToRespond = false;
         //public bool hasResponded = false;
         public string name = "";
@@ -20,7 +22,9 @@ namespace ChillLobbyServer
         {
             this.myConnection = myConnection;
             this.name = name;
-            Console.WriteLine(name + " - " + myConnection.ToString() + " has joined the server.");
+            myIp = (IPEndPoint)myConnection.Client.RemoteEndPoint;
+            Console.WriteLine(name + " (" + myIp.ToString() + ") has joined the server.");
+            myPlayer = new Player();
         }
     }
 }

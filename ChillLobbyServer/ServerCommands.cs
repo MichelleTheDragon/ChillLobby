@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -20,6 +21,14 @@ namespace ChillLobbyServer
         object msgLock = new object();
         bool serverLive = false;
 
+        int outServerFull = 1;
+        int outServerChange = 2;
+        int outServerMsg = 3;
+        int outClientMsg = 4;
+
+        int inClientAction = 1;
+        int inClientMsg = 2;
+
         public void StartServer()
         {
             server.Start();
@@ -36,7 +45,6 @@ namespace ChillLobbyServer
         {
             AcceptConnection();
             TcpClient client = server.EndAcceptTcpClient(result);
-            Console.WriteLine("Someone joined!");
             MyConnection clientCon = new MyConnection(client, "Player");
             allConnections.Add(clientCon);
             NetworkStream stream = client.GetStream();
@@ -52,6 +60,7 @@ namespace ChillLobbyServer
 
         public void InboundPackages(NetworkStream client, MyConnection clientCon)
         {
+            string clientIp = ((IPEndPoint)(clientCon.myConnection.Client.RemoteEndPoint)).ToString();
             try
             {
                 while (serverLive)
@@ -60,7 +69,7 @@ namespace ChillLobbyServer
                     client.Read(msg, 0, msg.Length);
                     string dataDecoded = Encoding.UTF8.GetString(msg);
 
-                    Console.WriteLine("User (" + clientCon.myConnection.ToString() + ") wrote: " + dataDecoded);
+                    Console.WriteLine("User (" + clientIp + ") wrote: " + dataDecoded);
 
                     lock (msgLock)
                     {
@@ -70,7 +79,7 @@ namespace ChillLobbyServer
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Console.WriteLine(clientCon.name + " (" + clientIp + ") has left the server.");
             }
         }
 
@@ -90,7 +99,7 @@ namespace ChillLobbyServer
                         {
                             foreach (Message m in allMessages)
                             {
-                                byte[] encodedMsg = Encoding.UTF8.GetBytes(m.myMessage);
+                                byte[] encodedMsg = Encoding.UTF8.GetBytes(outClientMsg + m.myMessage);
                                 c.myConnection.GetStream().Write(encodedMsg, 0, encodedMsg.Length);
                             }
                         }
@@ -124,7 +133,16 @@ namespace ChillLobbyServer
                         case "!Msg": case "!msg":
                             if (commandText.Length >= 6)
                             {
-                                allAdminMessages.Add(new AdminMessage(commandText.Substring(6, commandText.Length)));
+                                string adminMsg = commandText.Substring(6, commandText.Length);
+                                byte[] encodedMsg = Encoding.UTF8.GetBytes(outServerMsg + adminMsg);
+                                //allAdminMessages.Add(new AdminMessage(commandText.Substring(6, commandText.Length))); 
+                                foreach (MyConnection c in allConnections)
+                                {
+                                    if (c.myConnection.Connected == true)
+                                    {
+                                        c.myConnection.GetStream().Write(encodedMsg, 0, encodedMsg.Length);
+                                    }
+                                }
                             }
                             else
                             {
@@ -141,7 +159,10 @@ namespace ChillLobbyServer
                             Console.WriteLine("Client number  |    Client Ip Address    |    Client Name");
                             for (int i = 0; i < allConnections.Count; i++)//MyConnection c in allConnections)
                             {
-                                Console.WriteLine(i+1 + "        " + allConnections[i].myConnection.ToString() + "      " + allConnections[i].name);
+                                if (allConnections[i].myConnection.Connected)
+                                {
+                                    Console.WriteLine(i + 1 + "                 " + ((IPEndPoint)(allConnections[i].myConnection.Client.RemoteEndPoint)).ToString() + "        " + allConnections[i].name);
+                                }
                             }
                             break;
                         case "!Save": case "!save":
