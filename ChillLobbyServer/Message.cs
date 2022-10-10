@@ -18,4 +18,14 @@ namespace ChillLobbyServer
             this.myMessage = myMessage;
         }
     }
+
+    internal class AdminMessage
+    {
+        public string myMessage;
+
+        public AdminMessage(string myMessage)
+        {
+            this.myMessage = myMessage;
+        }
+    }
 }

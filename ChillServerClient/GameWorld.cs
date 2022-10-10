@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Net.Sockets;
+using System.Net;
 
 namespace ChillServerClient
 {
@@ -8,6 +10,7 @@ namespace ChillServerClient
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+        private ConnectionToServer myConnection;
 
         public GameWorld()
         {
@@ -27,6 +30,7 @@ namespace ChillServerClient
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            myConnection = new ConnectionToServer("192.168.68.107");
             // TODO: use this.Content to load your game content here
         }
 
@@ -34,6 +38,7 @@ namespace ChillServerClient
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
 
             // TODO: Add your update logic here
 
