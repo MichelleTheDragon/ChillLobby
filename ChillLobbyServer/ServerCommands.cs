@@ -45,7 +45,7 @@ namespace ChillLobbyServer
         {
             AcceptConnection();
             TcpClient client = server.EndAcceptTcpClient(result);
-            MyConnection clientCon = new MyConnection(client, "Player");
+            MyConnection clientCon = new MyConnection(client, "Player " + (allConnections.Count + 1));
             allConnections.Add(clientCon);
             NetworkStream stream = client.GetStream();
             InboundPackages(stream, clientCon);
