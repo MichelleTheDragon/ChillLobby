@@ -23,7 +23,7 @@ namespace ChillLobbyLoginAPI.Controllers
             _configuration = configuration;
         }
 
-        [HttpPost("register user")]
+        [HttpPost("RegisterUser")]
         public async Task<ActionResult<User>> RegisterUser(UserRegister request)
         {
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
@@ -37,7 +37,7 @@ namespace ChillLobbyLoginAPI.Controllers
             return Ok(newUser);
         }
 
-        [HttpPost("register server")]
+        [HttpPost("RegisterServer")]
         public async Task<ActionResult<Server>> RegisterServer(ServerRegister request)
         {
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
@@ -51,7 +51,7 @@ namespace ChillLobbyLoginAPI.Controllers
             return Ok(newServer);
         }
 
-        [HttpPost("login user")]
+        [HttpPost("LoginUser")]
         public async Task<ActionResult<string>> LoginUser(UserRegister request)
         {
             foreach (User user in users)
@@ -71,7 +71,7 @@ namespace ChillLobbyLoginAPI.Controllers
             }
             return BadRequest("User not found.");
         }
-        [HttpPost("login server")]
+        [HttpPost("LoginServer")]
         public async Task<ActionResult<string>> LoginServer(ServerRegister request)
         {
             foreach (Server server in servers)
@@ -93,7 +93,7 @@ namespace ChillLobbyLoginAPI.Controllers
         }
 
 
-        [HttpPost("check user"), Authorize(Roles = "Admin")]
+        [HttpPost("CheckUser"), Authorize(Roles = "Admin")]
         public async Task<ActionResult<string>> CheckToken(string token, string name)
         {
             //var mySecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
