@@ -11,6 +11,7 @@ namespace ChillServerClient
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private ConnectionToServer myConnection;
+        private Texture2D background;
 
         public GameWorld()
         {
@@ -21,7 +22,16 @@ namespace ChillServerClient
 
         protected override void Initialize()
         {
+            // Program settings
+            Window.Title = "Chill Lobby";            //Sets the window title
+            Window.AllowAltF4 = true;
+
+            // Window sizeing
+            _graphics.IsFullScreen = false;             //Is it fullscreen? No.
+            Window.AllowUserResizing = true;
+
             // TODO: Add your initialization logic here
+
 
             base.Initialize();
         }
@@ -29,10 +39,10 @@ namespace ChillServerClient
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            string hostName = Dns.GetHostName();
-            string myIP = Dns.GetHostEntry(hostName).AddressList[3].ToString();
-            myConnection = new ConnectionToServer(myIP);// "192.168.1.75");
+            background = Content.Load<Texture2D>("Backgrounds\\FuldBgWSideTable");
+            //string hostName = Dns.GetHostName()
+            //string myIP = Dns.GetHostEntry(hostName).AddressList[3].ToString();
+            //myConnection = new ConnectionToServer(myIP);// "192.168.1.75");
             // TODO: use this.Content to load your game content here
         }
 
@@ -50,9 +60,10 @@ namespace ChillServerClient
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-
+            _spriteBatch.Begin();
+            _spriteBatch.Draw(background, new Vector2(0, 0), Color.White);
             // TODO: Add your drawing code here
-
+            _spriteBatch.End();
             base.Draw(gameTime);
         }
     }
