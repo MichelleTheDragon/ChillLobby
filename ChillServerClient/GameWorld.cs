@@ -28,8 +28,11 @@ namespace ChillServerClient
 
             // Window sizeing
             _graphics.IsFullScreen = false;             //Is it fullscreen? No.
-            Window.AllowUserResizing = true;
-
+            Window.AllowUserResizing = true;           //Allows users to be able to drag the window to preferred size.
+            _graphics.PreferredBackBufferWidth = 1600;  //Width of the window
+            _graphics.PreferredBackBufferHeight = 900;  //Height of the window
+            _graphics.SynchronizeWithVerticalRetrace = true;    // Enable VSync.
+            _graphics.ApplyChanges();                           //Needed for the resolution to change
             // TODO: Add your initialization logic here
 
 
@@ -42,7 +45,7 @@ namespace ChillServerClient
             background = Content.Load<Texture2D>("Backgrounds\\FuldBgWSideTable");
             //string hostName = Dns.GetHostName()
             //string myIP = Dns.GetHostEntry(hostName).AddressList[3].ToString();
-            //myConnection = new ConnectionToServer(myIP);// "192.168.1.75");
+            //myConnection = new ConnectionToServer("87.49.251.155");// "192.168.1.75");
             // TODO: use this.Content to load your game content here
         }
 
