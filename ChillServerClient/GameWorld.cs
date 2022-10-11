@@ -30,7 +30,9 @@ namespace ChillServerClient
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            myConnection = new ConnectionToServer("192.168.68.107");
+            string hostName = Dns.GetHostName();
+            string myIP = Dns.GetHostEntry(hostName).AddressList[3].ToString();
+            myConnection = new ConnectionToServer(myIP);// "192.168.1.75");
             // TODO: use this.Content to load your game content here
         }
 
