@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Threading;
 using System.Net.Http.Json;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace ChillServerClient
 {
@@ -19,17 +22,20 @@ namespace ChillServerClient
         string url = "https://localhost:7045/api/Auth/";
         HttpClient clientAPI = new HttpClient();
         string userToken;
-
-        public ConnectionToServer(string IpAddress)
-        {
-        }
+        string logedUsername;
 
         public async Task<bool> CreateUserAsync(string username, string password)
         {
-            HttpContent stringContent = new StringContent("{\"username\":\"" + username + "\"," + "\"password\":\"" + password +"\"}");
+            var jUser = new JUser()
+            {
+                username = username,
+                password = password
+            };
+            string serializedLogin = JsonConvert.SerializeObject(jUser);
+            StringContent httpContent = new StringContent(serializedLogin, Encoding.UTF8, "application/json");
             try
             {
-                var response = await clientAPI.PostAsJsonAsync(url + "RegisterUser", stringContent);
+                var response = await clientAPI.PostAsync(url + "RegisterUser", httpContent);
 
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
@@ -43,15 +49,22 @@ namespace ChillServerClient
             return false;
         }
 
-        public async Task<bool> LoginUser(string username, string password)
+        public async Task<bool> LoginUserAsync(string username, string password)
         {
-            HttpContent stringContent = new StringContent("{\"username\":\"" + username + "\"," + "\"password\":\"" + password + "\"}");
+            var jUser = new JUser()
+            {
+                username = username,
+                password = password
+            };
+            var serializedLogin = JsonConvert.SerializeObject(jUser);
+            StringContent httpContent = new StringContent(serializedLogin, Encoding.UTF8, "application/json");
             try
             {
-                var response = await clientAPI.PostAsJsonAsync(url + "LoginUser", stringContent);
+                var response = await clientAPI.PostAsJsonAsync(url + "LoginUser", httpContent);
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
                     userToken = response.Content.ReadAsStringAsync().Result;
+                    logedUsername = username;
                     return true;
                 }
                 else
@@ -68,10 +81,28 @@ namespace ChillServerClient
 
         public bool ConnectToServer(string serverIp)
         {
-            serverEp = new IPEndPoint(IPAddress.Parse(serverIp), 11000);
-            client.Connect(serverEp);
-            
+            char[] delimiterChars = { ':' };
+            string[] fullIpAddress = serverIp.Split(delimiterChars);
+            int serverPort;
+            bool success = int.TryParse(fullIpAddress[1], out serverPort);
+            if (success)
+            {
+                serverEp = new IPEndPoint(IPAddress.Parse(fullIpAddress[0]), serverPort);
+                client.Connect(serverEp);
+
+                byte[] encodedMsg = Encoding.UTF8.GetBytes(userToken + ":-:SplitPoint:-:" + logedUsername);
+                client.GetStream().Write(encodedMsg, 0, encodedMsg.Length);
+                return true;
+            }
+
             return false;
         }
+    }
+
+    [Serializable]
+    internal class JUser
+    {
+        public string username { get; set; }
+        public string password { get; set; }
     }
 }

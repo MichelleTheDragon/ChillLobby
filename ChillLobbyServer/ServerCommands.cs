@@ -1,8 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -45,10 +49,49 @@ namespace ChillLobbyServer
         {
             AcceptConnection();
             TcpClient client = server.EndAcceptTcpClient(result);
-            MyConnection clientCon = new MyConnection(client, "Player " + (allConnections.Count + 1));
-            allConnections.Add(clientCon);
             NetworkStream stream = client.GetStream();
-            InboundPackages(stream, clientCon);
+            //bool isValidUser = CheckUserAsync(stream).GetAwaiter().GetResult();
+            //if (isValidUser != true)
+            //{
+            //    client.Close();
+            //} else
+            //{
+                MyConnection clientCon = new MyConnection(client, "Player " + (allConnections.Count + 1));
+                allConnections.Add(clientCon);
+                InboundPackages(stream, clientCon);
+            //}
+        }
+        private static async Task<bool> CheckUserAsync(NetworkStream stream)
+        {
+            byte[] msg = new byte[1024];
+            stream.Read(msg, 0, msg.Length);
+            string dataDecoded = Encoding.UTF8.GetString(msg);
+            string[] splitInfo = dataDecoded.Split(":-:SplitPoint:-:");
+            string url = "https://localhost:7045/api/Auth/";
+
+            JCheckUser jCheckUser = new JCheckUser()
+            {
+                token = splitInfo[0],
+                username = splitInfo[1]
+            };
+            var serializedLogin = JsonConvert.SerializeObject(jCheckUser);
+            HttpContent httpContent = new StringContent(serializedLogin, Encoding.UTF8, "application/json");
+
+            HttpClient clientTest = new HttpClient();
+            try
+            {
+                var response1 = await clientTest.PostAsJsonAsync(url + "CheckUser", httpContent);
+                
+                if (response1.StatusCode == HttpStatusCode.OK)
+                {
+                    return true;
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+            return false;
         }
 
         public void StopServer()

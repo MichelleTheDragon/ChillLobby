@@ -7,6 +7,9 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Principal;
 using System.Text;
+using System.Text.Json;
+using Newtonsoft.Json;
+using System.Net.Http;
 
 namespace ChillLobbyLoginAPI.Controllers
 {
@@ -43,20 +46,6 @@ namespace ChillLobbyLoginAPI.Controllers
             return Ok(newUser);
         }
 
-        [HttpPost("RegisterServer")]
-        public async Task<ActionResult<Server>> RegisterServer(ServerRegister request)
-        {
-            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
-
-            Server newServer = new Server();
-            newServer.Username = request.Username;
-            newServer.PasswordHash = passwordHash;
-            newServer.PasswordSalt = passwordSalt;
-            servers.Add(newServer);
-
-            return Ok(newServer);
-        }
-
         [HttpPost("LoginUser")]
         public async Task<ActionResult<string>> LoginUser(UserRegister request)
         {
@@ -77,6 +66,21 @@ namespace ChillLobbyLoginAPI.Controllers
             }
             return BadRequest("User not found.");
         }
+
+        [HttpPost("RegisterServer")]
+        public async Task<ActionResult<Server>> RegisterServer(ServerRegister request)
+        {
+            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+            Server newServer = new Server();
+            newServer.Username = request.Username;
+            newServer.PasswordHash = passwordHash;
+            newServer.PasswordSalt = passwordSalt;
+            servers.Add(newServer);
+
+            return Ok(newServer);
+        }
+
         [HttpPost("LoginServer")]
         public async Task<ActionResult<string>> LoginServer(ServerRegister request)
         {

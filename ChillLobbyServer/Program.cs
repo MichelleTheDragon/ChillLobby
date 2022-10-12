@@ -1,8 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using System.Threading;
 
 namespace ChillLobbyServer
@@ -21,16 +25,22 @@ namespace ChillLobbyServer
             string serverToken;
 
             string url = "https://localhost:7045/api/Auth/";
-            HttpContent stringContent = new StringContent("{\"username\":\"IamServer\"," + "\"password\":\"IamSecret\"}");
+
+            JServerLogin jServerLogin = new JServerLogin() { 
+                username = "IamServer", 
+                password = "IamSecret"
+            };
+            var serializedLogin = JsonConvert.SerializeObject(jServerLogin);
+            StringContent httpContent = new StringContent(serializedLogin, Encoding.UTF8, "application/json");
 
             HttpClient client = new HttpClient();
             try
             {
-                var response1 = await client.PostAsJsonAsync(url + "RegisterServer", stringContent);
+                var response1 = await client.PostAsJsonAsync(url + "RegisterServer", httpContent);
 
                 if (response1.StatusCode == HttpStatusCode.OK)
                 {
-                    var response2 = await client.PostAsJsonAsync(url + "LoginServer", stringContent);
+                    var response2 = await client.PostAsJsonAsync(url + "LoginServer", httpContent);
                     if (response2.StatusCode == HttpStatusCode.OK)
                     {
                         serverToken = response2.Content.ReadAsStringAsync().Result;

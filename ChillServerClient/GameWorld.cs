@@ -11,6 +11,7 @@ namespace ChillServerClient
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private ConnectionToServer myConnection;
+        private UI myUI;
 
         public GameWorld()
         {
@@ -30,9 +31,12 @@ namespace ChillServerClient
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            string hostName = Dns.GetHostName();
-            string myIP = Dns.GetHostEntry(hostName).AddressList[3].ToString();
-            myConnection = new ConnectionToServer("87.49.251.155");// "192.168.1.75");
+            myUI = new UI(Content, GraphicsDevice);
+
+            //string hostName = Dns.GetHostName();
+            //string myIP = Dns.GetHostEntry(hostName).AddressList[3].ToString();
+            //myConnection = new ConnectionToServer();// "192.168.1.75");
+            //myConnection.ConnectToServer(myIP);
             // TODO: use this.Content to load your game content here
         }
 
@@ -44,6 +48,8 @@ namespace ChillServerClient
 
             // TODO: Add your update logic here
 
+            myUI.Update(gameTime);
+
             base.Update(gameTime);
         }
 
@@ -52,7 +58,7 @@ namespace ChillServerClient
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
-
+            myUI.Draw(_spriteBatch);
             base.Draw(gameTime);
         }
     }
