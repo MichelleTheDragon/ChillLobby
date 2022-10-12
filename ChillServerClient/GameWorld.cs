@@ -32,7 +32,7 @@ namespace ChillServerClient
 
             string hostName = Dns.GetHostName();
             string myIP = Dns.GetHostEntry(hostName).AddressList[3].ToString();
-            myConnection = new ConnectionToServer(myIP);// "192.168.1.75");
+            myConnection = new ConnectionToServer("87.49.251.155");// "192.168.1.75");
             // TODO: use this.Content to load your game content here
         }
 

@@ -26,6 +26,12 @@ namespace ChillLobbyLoginAPI.Controllers
         [HttpPost("RegisterUser")]
         public async Task<ActionResult<User>> RegisterUser(UserRegister request)
         {
+            foreach (User user in users) {
+                if (user.Username == request.Username)
+                {
+                    return BadRequest("Username already in use.");
+                }
+            }
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
             User newUser = new User();
