@@ -60,8 +60,8 @@ namespace ChillServerClient
             StringContent httpContent = new StringContent(serializedLogin, Encoding.UTF8, "application/json");
             try
             {
-                var response = await clientAPI.PostAsJsonAsync(url + "LoginUser", httpContent);
-                if (response.StatusCode != HttpStatusCode.OK)
+                var response = await clientAPI.PostAsync(url + "LoginUser", httpContent);
+                if (response.StatusCode == HttpStatusCode.OK)
                 {
                     userToken = response.Content.ReadAsStringAsync().Result;
                     logedUsername = username;

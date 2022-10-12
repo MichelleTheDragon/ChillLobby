@@ -54,16 +54,16 @@ namespace ChillServerClient
             isLoading = true;
 
             loadingMsg = 1;
-            if (myConnection.CreateUserAsync("dddd", "dawdawf").GetAwaiter().GetResult() == true)
+            if (myConnection.CreateUserAsync("g1h3h1313", "51wda84").GetAwaiter().GetResult() == true)
             {
                 loadingMsg = 2;
-                if (myConnection.LoginUserAsync("dddd", "dawdawf").GetAwaiter().GetResult() == true)
+                if (myConnection.LoginUserAsync("g1h3h1313", "51wda84").GetAwaiter().GetResult() == true)
                 {
                     loadingMsg = 3;
                     myConnection.ConnectToServer("192.168.68.107:11000");
                 }
             }
-            loadingMsg = 4;
+            //loadingMsg = 4;
             isLoading = false;
         }
 
