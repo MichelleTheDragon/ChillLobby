@@ -12,6 +12,10 @@ namespace ChillServerClient
         private SpriteBatch _spriteBatch;
         private ConnectionToServer myConnection;
         private Texture2D background;
+        private Texture2D garden;
+        private Texture2D tables;
+        public Vector2 speed;
+
 
         public GameWorld()
         {
@@ -27,14 +31,12 @@ namespace ChillServerClient
             Window.AllowAltF4 = true;
 
             // Window sizeing
-            _graphics.IsFullScreen = false;             //Is it fullscreen? No.
-            Window.AllowUserResizing = true;           //Allows users to be able to drag the window to preferred size.
-            _graphics.PreferredBackBufferWidth = 1600;  //Width of the window
-            _graphics.PreferredBackBufferHeight = 900;  //Height of the window
-            _graphics.SynchronizeWithVerticalRetrace = true;    // Enable VSync.
+            _graphics.IsFullScreen = false;                     //Is it fullscreen? No.
+            Window.AllowUserResizing = true;                    //Allows users to be able to drag the window to preferred size.
+            _graphics.PreferredBackBufferWidth = 1600;          //Width of the window
+            _graphics.PreferredBackBufferHeight = 900;          //Height of the window
+            _graphics.SynchronizeWithVerticalRetrace = true;    //Enable VSync.
             _graphics.ApplyChanges();                           //Needed for the resolution to change
-            // TODO: Add your initialization logic here
-
 
             base.Initialize();
         }
@@ -42,7 +44,13 @@ namespace ChillServerClient
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            background = Content.Load<Texture2D>("Backgrounds\\FuldBgWSideTable");
+
+            //Asset layers
+            background = Content.Load<Texture2D>("Backgrounds\\FuldBgwMat");    //Floor and walls
+            tables = Content.Load<Texture2D>("Backgrounds\\Tabled");            //Tables
+            garden = Content.Load<Texture2D>("Backgrounds\\Tabled");            //Garden
+
+            //Server Connection
             //string hostName = Dns.GetHostName()
             //string myIP = Dns.GetHostEntry(hostName).AddressList[3].ToString();
             //myConnection = new ConnectionToServer("87.49.251.155");// "192.168.1.75");
@@ -62,7 +70,7 @@ namespace ChillServerClient
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.DarkSeaGreen);
             _spriteBatch.Begin();
             _spriteBatch.Draw(background, new Vector2(0, 0), Color.White);
             // TODO: Add your drawing code here
