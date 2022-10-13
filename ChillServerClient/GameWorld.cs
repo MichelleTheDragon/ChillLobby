@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using ChillServerClient.World;
 using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Audio;
+using ChillServerClient.Sprites;
+using ChillServerClient.Models;
 
 namespace ChillServerClient
 {
@@ -33,6 +35,8 @@ namespace ChillServerClient
         SoundEffect sound;  //For the sound effect on buttons/clicks
         Song song;          //for the background songs
         #endregion
+        private List<Sprite> _sprites;
+
 
         public GameWorld()
         {
@@ -110,6 +114,30 @@ namespace ChillServerClient
             song = Content.Load<Song>("Sounds\\You and the Sea");        //The background music
             MediaPlayer.IsRepeating = true; //for the loop
             MediaPlayer.Play(song);         //Plays it
+            // TODO: use this.Content to load your game content here
+
+            var animations = new Dictionary<string, Animation>()
+            {
+                {"PlayerBack", new Animation(Content.Load<Texture2D>("Player/PlayerBack"), 1) },
+                {"PlayerFront", new Animation(Content.Load<Texture2D>("Player/PlayerFront"), 1) },
+                {"WalkLeft", new Animation(Content.Load<Texture2D>("Player/WalkLeft"), 2) },
+                {"WalkRight", new Animation(Content.Load<Texture2D>("Player/WalkRight"), 2) },
+            };
+
+            _sprites = new List<Sprite>()
+            {
+                new Sprite(animations)
+                {
+                    Position = new Vector2(100,100),
+                    Input = new Input()
+                    {
+                        Up = Keys.W,
+                        Down = Keys.S,
+                        Left = Keys.A,
+                        Right = Keys.D,
+                    }
+                }
+            };
         }
 
         protected override void Update(GameTime gameTime)
@@ -125,6 +153,9 @@ namespace ChillServerClient
 
             myUI.Update(gameTime);
 
+            foreach (var sprite in _sprites)
+                sprite.Update(gameTime, _sprites);
+
             base.Update(gameTime);
         }
 
@@ -138,6 +169,13 @@ namespace ChillServerClient
             }
             //_spriteBatch.Draw(background, new Vector2(0, 0), Color.White);
             // TODO: Add your drawing code here
+            _spriteBatch.End();
+
+            _spriteBatch.Begin();
+
+            foreach (var sprite in _sprites)
+                sprite.Draw(_spriteBatch);
+
             _spriteBatch.End();
 
             myUI.Draw(_spriteBatch);
