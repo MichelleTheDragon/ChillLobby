@@ -51,19 +51,19 @@ namespace ChillLobbyServer
             AcceptConnection();
             TcpClient client = server.EndAcceptTcpClient(result);
             NetworkStream stream = client.GetStream();
-            bool isValidUser = CheckUserAsync(stream).GetAwaiter().GetResult();
-            if (isValidUser != true)
+            string isValidUser = CheckUserAsync(stream).GetAwaiter().GetResult();
+            if (isValidUser.Length <= 0)
             {
                 client.Close();
             }
             else
             {
-                MyConnection clientCon = new MyConnection(client, "Player " + (allConnections.Count + 1));
+                MyConnection clientCon = new MyConnection(client, isValidUser);
                 allConnections.Add(clientCon);
                 InboundPackages(stream, clientCon);
             }
     }
-        private static async Task<bool> CheckUserAsync(NetworkStream stream)
+        private static async Task<string> CheckUserAsync(NetworkStream stream)
         {
             byte[] msg = new byte[1024];
             int bytes = stream.Read(msg, 0, msg.Length);
@@ -86,14 +86,14 @@ namespace ChillLobbyServer
                 //Console.WriteLine(response1.Content.ReadAsStringAsync().Result);
                 if (response1.StatusCode == HttpStatusCode.OK)
                 {
-                    return true;
+                    return jCheckUser.username;
                 }
             }
             catch (Exception)
             {
 
             }
-            return false;
+            return string.Empty;
         }
 
         public void StopServer()
