@@ -109,7 +109,6 @@ namespace ChillServerClient
             
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
             //background
             foreach (var bgl in _backgroundList)    //Background loop = bgl
             {
