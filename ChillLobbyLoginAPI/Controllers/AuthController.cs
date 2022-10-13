@@ -103,15 +103,15 @@ namespace ChillLobbyLoginAPI.Controllers
         }
 
 
-        [HttpPost("CheckUser"), Authorize(Roles = "Admin")]
-        public async Task<ActionResult<string>> CheckToken(string token, string name)
+        [HttpPost("CheckUser")]//, Authorize(Roles = "Admin")]
+        public async Task<ActionResult<string>> CheckToken(UserCheck userToCheck)
         {
             //var mySecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
             var tokenHandler = new JwtSecurityTokenHandler();
             
             try
             {
-                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                tokenHandler.ValidateToken(userToCheck.Token, new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value)),
@@ -125,9 +125,9 @@ namespace ChillLobbyLoginAPI.Controllers
             }
             foreach (User user in users)
             {
-                if (user.Username == name)
+                if (user.Username == userToCheck.Username)
                 {
-                    if (user.UserToken == token)
+                    if (user.UserToken == userToCheck.Token)
                     {
                         return Ok("Token valid");
                     } else

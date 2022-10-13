@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Net.Sockets;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -82,7 +83,7 @@ namespace ChillLobbyServer
             try
             {
                 var response1 = await clientTest.PostAsync(url + "CheckUser", httpContent);
-                
+                //Console.WriteLine(response1.Content.ReadAsStringAsync().Result);
                 if (response1.StatusCode == HttpStatusCode.OK)
                 {
                     return true;
