@@ -113,6 +113,7 @@ namespace ChillServerClient
             //sound
             song = Content.Load<Song>("Sounds\\You and the Sea");        //The background music
             MediaPlayer.IsRepeating = true; //for the loop
+            MediaPlayer.Volume = 0.2f;
             MediaPlayer.Play(song);         //Plays it
             // TODO: use this.Content to load your game content here
 
@@ -146,10 +147,20 @@ namespace ChillServerClient
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             //background
-            foreach (var bgl in _backgroundList)    //Background loop = bgl
+            if (UI.HasJoinedServer)
             {
-                bgl.Update(gameTime);
+                foreach (var bgl in _backgroundList)    //Background loop = bgl
+                {
+                    bgl.Update(gameTime);
+                }
+
+
+                foreach (var sprite in _sprites)
+                    sprite.Update(gameTime, _sprites);
             }
+
+
+            // TODO: Add your update logic here
 
             myUI.Update(gameTime);
 
@@ -162,12 +173,26 @@ namespace ChillServerClient
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.DarkSeaGreen);       //Default background
-            _spriteBatch.Begin(SpriteSortMode.FrontToBack); //the order in which the sprites for the background are. front first then the other lies behind it
-            foreach (var bg in _backgroundList)             //bg = background
+
+            if (UI.HasJoinedServer)
             {
-                bg.Draw(gameTime, _spriteBatch);
+                _spriteBatch.Begin(SpriteSortMode.FrontToBack); //the order in which the sprites for the background are. front first then the other lies behind it
+                foreach (var bg in _backgroundList)             //bg = background
+                {
+                    bg.Draw(gameTime, _spriteBatch);
+                }
+                //_spriteBatch.Draw(background, new Vector2(0, 0), Color.White);
+                // TODO: Add your drawing code here
+                _spriteBatch.End();
+
+                _spriteBatch.Begin();
+
+                foreach (var sprite in _sprites)
+                    sprite.Draw(_spriteBatch);
+
+                _spriteBatch.End();
             }
-            //_spriteBatch.Draw(background, new Vector2(0, 0), Color.White);
+
             // TODO: Add your drawing code here
             _spriteBatch.End();
 

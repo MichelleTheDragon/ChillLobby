@@ -84,7 +84,10 @@ namespace ChillServerClient.Sprites
 
         public virtual void Update(GameTime gameTime, List<Sprite> sprites)
         {
-            Move();
+            if (UI.writingArea == 0)
+            {
+                Move();
+            }
 
             SetAnimations();
 
@@ -94,7 +97,7 @@ namespace ChillServerClient.Sprites
             Velocity = Vector2.Zero;
         }
 
-        
+
 
     }
 }

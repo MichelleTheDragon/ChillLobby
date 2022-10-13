@@ -97,6 +97,37 @@ namespace ChillServerClient
 
             return false;
         }
+
+        public void InboundMsg()
+        {
+            while (UI.HasJoinedServer)
+            {
+                byte[] msg = new byte[1024];
+                int bytes = client.GetStream().Read(msg, 0, msg.Length);
+                string dataDecoded = Encoding.UTF8.GetString(msg, 0, bytes);
+                lock (UI.msgLock)
+                {
+                    for (int i = 0; i < UI.allMessages.Length; i++)
+                    {
+                        if (i == UI.allMessages.Length - 1)
+                        {
+                            UI.allMessages[i] = dataDecoded;
+                        }
+                        else
+                        {
+                            UI.allMessages[i] = UI.allMessages[i + 1];
+                        }
+                    }
+                }
+            }
+        }
+
+        public bool SendMsgToServer(string msg)
+        {
+            byte[] encodedMsg = Encoding.UTF8.GetBytes(msg);
+            client.GetStream().Write(encodedMsg, 0, encodedMsg.Length);
+            return true;
+        }
     }
 
     [Serializable]

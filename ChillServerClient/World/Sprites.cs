@@ -35,7 +35,7 @@ namespace ChillServerClient.World
 
         public override void Draw(GameTime gametime, SpriteBatch _spriteBatch)
         {
-            _spriteBatch.Draw(_texture, Position, null, Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, Layer);
+            _spriteBatch.Draw(_texture, Position, null, Color.White, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, Layer);
         }
 
         public override void Update(GameTime gametime)

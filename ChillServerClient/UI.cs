@@ -16,7 +16,8 @@ namespace ChillServerClient
     internal class UI
     {
         private SpriteFont baseFont;
-        private bool hasJoinedServer = false;
+        private static bool hasJoinedServer = false;
+        public static bool HasJoinedServer { get { return hasJoinedServer; } set { } }
         private bool isLoggedIn = false;
         private GraphicsDevice _graphicsDevice;
         int boxWidth1 = 150;
@@ -51,23 +52,47 @@ namespace ChillServerClient
         bool clickRegistered4;
         bool clickRegistered5;
         bool clickRegistered6;
+        Color[] data1;
+        Color[] data2;
+        Color[] data3;
+        Color[] data4;
 
+
+        int chatBoxWidth1 = 450;
+        int chatBoxHeight1 = 290;
+        Vector2 chatCoor1;
+        Texture2D chatRect1;
+        Color[] chatData1;
+
+        int chatBoxWidth2 = 450;
+        int chatBoxHeight2 = 30;
+        Vector2 chatCoor2;
+        Texture2D chatRect2;
+        Color[] chatData2;
+        bool isChatHovered1;
+        bool clickChatRegistered1;
+        float chatHeighLight = 0.6f;
+
+        int chatBoxWidth3 = 470;
+        int chatBoxHeight3 = 350;
+        Vector2 chatCoor3;
+        Texture2D chatRect3;
+        Color[] chatData3;
+
+        string message = "";
+        public static string[] allMessages = new string[8];
+        public static object msgLock = new object();
 
         private Keys[] lastPressedKeys;
         bool shiftDown;
 
-        int writingArea = 0;
+        public static int writingArea { get; private set; } = 0;
 
         bool isLoading;
         Thread newTest;
         string username = "username";
         string password = "password";
         string serverIp = "Ip Address";//192.168.68.107:11000
-
-        Color[] data1;
-        Color[] data2;
-        Color[] data3;
-        Color[] data4;
 
         ConnectionToServer myConnection = new ConnectionToServer();// "192.168.1.75");
 
@@ -99,55 +124,122 @@ namespace ChillServerClient
             coor4 = new Vector2(_graphicsDevice.Viewport.Width / 2.0f + 10, _graphicsDevice.Viewport.Height / 2.0f + 51);
             coor5 = new Vector2(_graphicsDevice.Viewport.Width / 2.0f - 70, _graphicsDevice.Viewport.Height / 2.0f - 11);
             coor6 = new Vector2(_graphicsDevice.Viewport.Width / 2.0f - 80, _graphicsDevice.Viewport.Height / 2.0f + 21);
-            //newTest = new Thread(new ThreadStart(Test));
+
+
+            chatRect1 = new Texture2D(_graphicsDevice, chatBoxWidth1, chatBoxHeight1);
+            chatData1 = new Color[chatBoxWidth1 * chatBoxHeight1];
+            chatRect1.SetData(ChangeColour(chatData1, Color.White));
+            chatCoor1 = new Vector2(30, _graphicsDevice.Viewport.Height - 350);
+
+            chatRect2 = new Texture2D(_graphicsDevice, chatBoxWidth2, chatBoxHeight2);
+            chatData2 = new Color[chatBoxWidth2 * chatBoxHeight2];
+            chatRect2.SetData(ChangeColour(chatData2, Color.White));
+            chatCoor2 = new Vector2(30, _graphicsDevice.Viewport.Height - 50);
+
+            chatRect3 = new Texture2D(_graphicsDevice, chatBoxWidth3, chatBoxHeight3);
+            chatData3 = new Color[chatBoxWidth3 * chatBoxHeight3];
+            chatRect3.SetData(ChangeColour(chatData3, Color.White));
+            chatCoor3 = new Vector2(20, _graphicsDevice.Viewport.Height - 360);
+            newTest = new Thread(new ThreadStart(myConnection.InboundMsg));
         }
 
         private void OnKeyDown(Keys key)
         {
             string newString;
-            if ((key == Keys.LeftShift || key == Keys.RightShift) && shiftDown == false)
+            if (key == Keys.Enter && writingArea != 0)
             {
-                shiftDown = true;
+                if (hasJoinedServer == true && writingArea == 4 && message.Length > 0)
+                {
+                    myConnection.SendMsgToServer(message);
+                    chatHeighLight = 0.6f;
+                    message = "";
+                }
+                writingArea = 0;
+            } else if (hasJoinedServer == true && key == Keys.Enter && writingArea == 0)
+            {
+                writingArea = 4;
+                chatHeighLight = 0.9f;
+                message = "";
             }
-            if (((key >= Keys.A && key <= Keys.Z) || (key >= Keys.D0 && key <= Keys.D9)) && writingArea <= 2)
+            if (writingArea > 0)
             {
-                if (shiftDown)
+                if ((key == Keys.LeftShift || key == Keys.RightShift) && shiftDown == false)
                 {
-                    newString = key.ToString();
-                } else
+                    shiftDown = true;
+                }
+                if (((key >= Keys.A && key <= Keys.Z) || (key >= Keys.D0 && key <= Keys.D9) || (key >= Keys.NumPad0 && key <= Keys.NumPad9)) && writingArea != 3)
                 {
-                    newString = key.ToString().ToLower();
-                    if (key >= Keys.D0 && key <= Keys.D9)
+                    if (shiftDown)
+                    {
+                        newString = key.ToString();
+                    } else
+                    {
+                        newString = key.ToString().ToLower();
+                    }
+                    if ((key >= Keys.D0 && key <= Keys.D9) || (key >= Keys.NumPad0 && key <= Keys.NumPad9))
                     {
                         newString = newString[newString.Length - 1].ToString();
                     }
+                    switch (writingArea)
+                    {
+                        case 1:
+                            username += newString;
+                            break;
+                        case 2:
+                            password += newString;
+                            break;
+                        case 4:
+                            message += newString;
+                            break;
+                    }
                 }
-                switch (writingArea)
+                else if(((key >= Keys.D0 && key <= Keys.D9) || (key >= Keys.NumPad0 && key <= Keys.NumPad9) || key == Keys.OemPeriod) && writingArea == 3)
                 {
-                    case 1:
-                        username += newString;
-                        break;
-                    case 2:
-                        password += newString;
-                        break;
+                    char newChar;
+                    if (shiftDown && key == Keys.OemPeriod)
+                    {
+                        newChar = ':';
+                    } else if (key == Keys.OemPeriod)
+                    {
+                        newChar = '.';
+                    }
+                    else
+                    {
+                        newString = key.ToString().ToLower();
+                        newChar = newString[newString.Length - 1];
+                    }
+                    serverIp += newChar;
                 }
-            }
-            else if((key >= Keys.D0 && key <= Keys.D9 || key == Keys.OemPeriod) && writingArea == 3)
-            {
-                char newChar;
-                if (shiftDown && key == Keys.OemPeriod)
+                if(key == Keys.Back)
                 {
-                    newChar = ':';
-                } else if (key == Keys.OemPeriod)
-                {
-                    newChar = '.';
+                    switch (writingArea)
+                    {
+                        case 1:
+                            if (username.Length > 0)
+                            {
+                                username = username.Remove(username.Length - 1, 1);
+                            }
+                            break;
+                        case 2:
+                            if (password.Length > 0)
+                            {
+                                password = password.Remove(password.Length - 1, 1);
+                            }
+                            break;
+                        case 3:
+                            if (serverIp.Length > 0)
+                            {
+                                serverIp = serverIp.Remove(serverIp.Length - 1, 1);
+                            }
+                            break;
+                        case 4:
+                            if (message.Length > 0)
+                            {
+                                message = message.Remove(message.Length - 1, 1);
+                            }
+                            break;
+                    }
                 }
-                else
-                {
-                    newString = key.ToString().ToLower();
-                    newChar = newString[newString.Length - 1];
-                }
-                serverIp += newChar;
             }
         }
 
@@ -156,30 +248,7 @@ namespace ChillServerClient
             if ((key == Keys.LeftShift || key == Keys.RightShift) && shiftDown == true)
             {
                 shiftDown = false;
-            } else if (key == Keys.Back)
-            {
-                switch (writingArea)
-                {
-                    case 1:
-                        if (username.Length > 0)
-                        {
-                            username = username.Remove(username.Length - 1, 1);
-                        }
-                        break;
-                    case 2:
-                        if (password.Length > 0)
-                        {
-                            password = password.Remove(password.Length - 1, 1);
-                        }
-                        break;
-                    case 3:
-                        if (serverIp.Length > 0)
-                        {
-                            serverIp = serverIp.Remove(serverIp.Length - 1, 1);
-                        }
-                        break;
-                }
-            }
+            } 
         }
 
         public void Test(int value)
@@ -200,49 +269,68 @@ namespace ChillServerClient
                     if (myConnection.ConnectToServer(serverIp) == true)
                     {
                         hasJoinedServer = true;
+                        newTest.Start();
                     }
                     break;
             }
-            //if (myConnection.CreateUserAsync(username, password).GetAwaiter().GetResult() == true)
-            //{
-            //    if (myConnection.LoginUserAsync(username, password).GetAwaiter().GetResult() == true)
-            //    {
-            //        myConnection.ConnectToServer(serverIp);// "192.168.68.107:11000");
-            //    }
-            //}
+            writingArea = 0;
             isLoading = false;
         }
 
         public void Update(GameTime gameTime)
         {
-            if (writingArea > 0)
+            MouseState mouseState = Mouse.GetState();
+            Point mousePoint = new Point(mouseState.X, mouseState.Y);
+
+            KeyboardState kbState = Keyboard.GetState();
+            Keys[] pressedKeys = kbState.GetPressedKeys();
+            foreach (Keys key in lastPressedKeys)
             {
-                KeyboardState kbState = Keyboard.GetState();
-                Keys[] pressedKeys = kbState.GetPressedKeys();
-
-                foreach (Keys key in lastPressedKeys)
+                if (!pressedKeys.Contains(key))
                 {
-                    if (!pressedKeys.Contains(key))
-                    {
-                        OnKeyUp(key);
-                    }
+                    OnKeyUp(key);
                 }
-
-                foreach (Keys key in pressedKeys)
-                {
-                    if (!lastPressedKeys.Contains(key))
-                    {
-                        OnKeyDown(key);
-                    }
-                }
-
-                lastPressedKeys = pressedKeys;
             }
 
-            if (hasJoinedServer != true)
+            foreach (Keys key in pressedKeys)
             {
-                MouseState mouseState = Mouse.GetState();
-                Point mousePoint = new Point(mouseState.X, mouseState.Y);
+                if (!lastPressedKeys.Contains(key))
+                {
+                    OnKeyDown(key);
+                }
+            }
+
+            lastPressedKeys = pressedKeys;
+
+            if (hasJoinedServer == true)
+            {
+
+                Rectangle chatRectangle2 = new Rectangle((int)chatCoor2.X, (int)chatCoor2.Y, chatRect2.Width, chatRect2.Height);
+                if (chatRectangle2.Contains(mousePoint) && isChatHovered1 != true && mouseState.LeftButton == ButtonState.Released)
+                {
+                    isChatHovered1 = true;
+                    chatHeighLight = 0.9f;
+                }
+                else if (!chatRectangle2.Contains(mousePoint) && isChatHovered1 == true)
+                {
+                    if (writingArea != 4)
+                    {
+                        chatHeighLight = 0.6f;
+                    }
+                    isChatHovered1 = false;
+                }
+                if (mouseState.LeftButton == ButtonState.Pressed && isChatHovered1 && !clickChatRegistered1)
+                {
+                    writingArea = 4;
+                    message = "";
+                    clickChatRegistered1 = true;
+                }
+                else if (mouseState.LeftButton == ButtonState.Released && clickChatRegistered1)
+                {
+                    clickChatRegistered1 = false;
+                }
+            }
+            else { 
                 if (isLoggedIn != true)
                 {
                     Rectangle rectangle1 = new Rectangle((int)coor1.X, (int)coor1.Y, rect1.Width, rect1.Height);
@@ -404,12 +492,28 @@ namespace ChillServerClient
 
         public void Draw(SpriteBatch _spriteBatch)
         {
-            _spriteBatch.Begin();
             if (hasJoinedServer)
             {
+                _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+                _spriteBatch.Draw(chatRect3, chatCoor3, Color.DarkGray * 0.8f); ;
+                _spriteBatch.Draw(chatRect1, chatCoor1, Color.LightGray * 0.6f); ;
+                _spriteBatch.Draw(chatRect2, chatCoor2, Color.LightGray * chatHeighLight);
+                lock (msgLock)
+                {
+                    for (int i = 0; i < allMessages.Length; i++)
+                    {
+                        //if (allMessages[i].Length > 0)
+                        //{
+                        //    _spriteBatch.DrawString(baseFont, allMessages[i], new Vector2(38, _graphicsDevice.Viewport.Height - 345 + 40 * i), Color.Black);
+                        //}
+                    }
+                }
+                _spriteBatch.DrawString(baseFont, message, new Vector2(38, _graphicsDevice.Viewport.Height - 45), Color.Black);
+                _spriteBatch.End();
 
             } else
             {
+                _spriteBatch.Begin();
                 if (isLoading == true)
                 {
                     _spriteBatch.DrawString(baseFont, "Loading... ", new Vector2(0, 0), Color.White);
@@ -435,10 +539,8 @@ namespace ChillServerClient
                     _spriteBatch.Draw(rect6, coor6, Color.White);
                     _spriteBatch.DrawString(baseFont, "Connect", new Vector2(_graphicsDevice.Viewport.Width / 2.0f - 35, _graphicsDevice.Viewport.Height / 2.0f + 25), Color.Black);
                 }
+                _spriteBatch.End();
             }
-
-            _spriteBatch.End();
-
         }
     }
 }
