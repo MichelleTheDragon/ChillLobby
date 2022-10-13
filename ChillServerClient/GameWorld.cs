@@ -136,10 +136,11 @@ namespace ChillServerClient
             {
                 bg.Draw(gameTime, _spriteBatch);
             }
-                //_spriteBatch.Draw(background, new Vector2(0, 0), Color.White);
-                // TODO: Add your drawing code here
-                _spriteBatch.End();
-                myUI.Draw(_spriteBatch);
+            //_spriteBatch.Draw(background, new Vector2(0, 0), Color.White);
+            // TODO: Add your drawing code here
+            _spriteBatch.End();
+
+            myUI.Draw(_spriteBatch);
             base.Draw(gameTime);
         }
     }
