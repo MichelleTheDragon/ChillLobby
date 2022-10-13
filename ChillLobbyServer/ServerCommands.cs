@@ -110,11 +110,11 @@ namespace ChillLobbyServer
             {
                 while (serverLive)
                 {
-                    byte[] msg = new byte[1024];
-                    client.Read(msg, 0, msg.Length);
-                    string dataDecoded = Encoding.UTF8.GetString(msg);
+                    byte[] msg = new byte[1024]; 
+                    int bytes = client.Read(msg, 0, msg.Length);
+                    string dataDecoded = Encoding.UTF8.GetString(msg, 0, bytes);
 
-                    Console.WriteLine("User (" + clientIp + ") wrote: " + dataDecoded);
+                    Console.WriteLine(clientCon.name + " (" + clientIp + ") wrote: " + dataDecoded);
 
                     lock (msgLock)
                     {
