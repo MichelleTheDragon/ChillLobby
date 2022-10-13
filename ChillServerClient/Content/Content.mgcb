@@ -61,3 +61,15 @@
 /processorParam:TextureFormat=Color
 /build:Backgrounds/Tabled.png
 
+#begin Sounds/You and the sea.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/You and the sea.mp3
+
+#begin Sounds/You and the sea.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Sounds/You and the sea.mp3
+

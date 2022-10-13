@@ -5,6 +5,8 @@ using System.Net.Sockets;
 using System.Net;
 using System.Collections.Generic;
 using ChillServerClient.World;
+using Microsoft.Xna.Framework.Media;
+using Microsoft.Xna.Framework.Audio;
 
 namespace ChillServerClient
 {
@@ -26,6 +28,9 @@ namespace ChillServerClient
         //Resolution
         public const int WantedWidth = 1600;    //The width I want for the window
         public const int WantedHeight = 900;    ///The height I want for the window
+        //sound
+        SoundEffect sound;  //For the sound effect on buttons/clicks
+        Song song;          //for the background songs
         #endregion
 
         public GameWorld()
@@ -92,6 +97,11 @@ namespace ChillServerClient
             //    Position = new Vector2(50, 50),
             //    Layerd = 0.60f; 
             //};
+
+            //sound
+            song = Content.Load<Song>("Sounds\\You and the Sea");        //The background music
+            MediaPlayer.IsRepeating = true; //for the loop
+            MediaPlayer.Play(song);         //Plays it
         }
 
         protected override void Update(GameTime gameTime)
