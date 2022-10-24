@@ -19,7 +19,7 @@ namespace ChillServerClient
         TcpClient client = new TcpClient();
         IPEndPoint serverEp;
 
-        string url = "https://localhost:7045/api/Auth/";
+        string url = "https://localhost:5001/api/Auth/";
         HttpClient clientAPI = new HttpClient();
         string userToken;
         string logedUsername;
@@ -105,18 +105,16 @@ namespace ChillServerClient
                 byte[] msg = new byte[1024];
                 int bytes = client.GetStream().Read(msg, 0, msg.Length);
                 string dataDecoded = Encoding.UTF8.GetString(msg, 0, bytes);
-                lock (UI.msgLock)
+                
+                for (int i = 0; i < UI.allMessages.Length; i++)
                 {
-                    for (int i = 0; i < UI.allMessages.Length; i++)
+                    if (i == UI.allMessages.Length - 1)
                     {
-                        if (i == UI.allMessages.Length - 1)
-                        {
-                            UI.allMessages[i] = dataDecoded;
-                        }
-                        else
-                        {
-                            UI.allMessages[i] = UI.allMessages[i + 1];
-                        }
+                        UI.allMessages[i] = dataDecoded;
+                    }
+                    else
+                    {
+                        UI.allMessages[i] = UI.allMessages[i + 1];
                     }
                 }
             }

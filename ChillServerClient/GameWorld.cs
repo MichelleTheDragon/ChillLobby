@@ -164,10 +164,6 @@ namespace ChillServerClient
 
             myUI.Update(gameTime);
 
-            foreach (var sprite in _sprites)
-                sprite.Update(gameTime, _sprites);
-
-            base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -194,14 +190,6 @@ namespace ChillServerClient
             }
 
             // TODO: Add your drawing code here
-            _spriteBatch.End();
-
-            _spriteBatch.Begin();
-
-            foreach (var sprite in _sprites)
-                sprite.Draw(_spriteBatch);
-
-            _spriteBatch.End();
 
             myUI.Draw(_spriteBatch);
             base.Draw(gameTime);

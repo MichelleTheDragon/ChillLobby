@@ -80,8 +80,8 @@ namespace ChillServerClient
         Color[] chatData3;
 
         string message = "";
-        public static string[] allMessages = new string[8];
-        public static object msgLock = new object();
+        public static string[] allMessages = new string[11] { "", "", "", "", "", "", "", "", "", "", "" };
+        //public static object msgLock = new object();
 
         private Keys[] lastPressedKeys;
         bool shiftDown;
@@ -167,8 +167,12 @@ namespace ChillServerClient
                 {
                     shiftDown = true;
                 }
-                if (((key >= Keys.A && key <= Keys.Z) || (key >= Keys.D0 && key <= Keys.D9) || (key >= Keys.NumPad0 && key <= Keys.NumPad9)) && writingArea != 3)
+                if (((key >= Keys.A && key <= Keys.Z) || (key >= Keys.D0 && key <= Keys.D9) || (key >= Keys.NumPad0 && key <= Keys.NumPad9) || (key == Keys.Space && writingArea == 4)) && writingArea != 3)
                 {
+                    if (key == Keys.Space)
+                    {
+                        newString = " ";
+                    } else
                     if (shiftDown)
                     {
                         newString = key.ToString();
@@ -269,6 +273,7 @@ namespace ChillServerClient
                     if (myConnection.ConnectToServer(serverIp) == true)
                     {
                         hasJoinedServer = true;
+                        newTest = new Thread(new ThreadStart(myConnection.InboundMsg));
                         newTest.Start();
                     }
                     break;
@@ -498,16 +503,15 @@ namespace ChillServerClient
                 _spriteBatch.Draw(chatRect3, chatCoor3, Color.DarkGray * 0.8f); ;
                 _spriteBatch.Draw(chatRect1, chatCoor1, Color.LightGray * 0.6f); ;
                 _spriteBatch.Draw(chatRect2, chatCoor2, Color.LightGray * chatHeighLight);
-                lock (msgLock)
+
+                for (int i = 0; i < allMessages.Length; i++)
                 {
-                    for (int i = 0; i < allMessages.Length; i++)
+                    if (allMessages[i].Length > 0)
                     {
-                        //if (allMessages[i].Length > 0)
-                        //{
-                        //    _spriteBatch.DrawString(baseFont, allMessages[i], new Vector2(38, _graphicsDevice.Viewport.Height - 345 + 40 * i), Color.Black);
-                        //}
+                        _spriteBatch.DrawString(baseFont, allMessages[i], new Vector2(38, _graphicsDevice.Viewport.Height - 345 + 25 * i), Color.Black);
                     }
                 }
+
                 _spriteBatch.DrawString(baseFont, message, new Vector2(38, _graphicsDevice.Viewport.Height - 45), Color.Black);
                 _spriteBatch.End();
 

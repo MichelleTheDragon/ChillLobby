@@ -69,7 +69,7 @@ namespace ChillLobbyServer
             int bytes = stream.Read(msg, 0, msg.Length);
             string dataDecoded = Encoding.UTF8.GetString(msg, 0, bytes);
             string[] splitInfo = dataDecoded.Split(":-:SplitPoint:-:");
-            string url = "https://localhost:7045/api/Auth/";
+            string url = "https://localhost:5001/api/Auth/";
 
             JCheckUser jCheckUser = new JCheckUser()
             {
@@ -144,7 +144,7 @@ namespace ChillLobbyServer
                         {
                             foreach (Message m in allMessages)
                             {
-                                byte[] encodedMsg = Encoding.UTF8.GetBytes(outClientMsg + m.myMessage);
+                                byte[] encodedMsg = Encoding.UTF8.GetBytes(m.thisConnection.name + ": " + m.myMessage);
                                 c.myConnection.GetStream().Write(encodedMsg, 0, encodedMsg.Length);
                             }
                         }
@@ -257,6 +257,7 @@ namespace ChillLobbyServer
                             StopServer();
                             break;
                         default:
+                            Console.WriteLine("No command entered (Type \"!Help\" to see list of commands)");
                             break;
                     }
                 }

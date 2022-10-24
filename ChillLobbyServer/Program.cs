@@ -24,7 +24,7 @@ namespace ChillLobbyServer
             serverCommands.StartServer();
             string serverToken;
 
-            string url = "https://localhost:7045/api/Auth/";
+            string url = "https://localhost:5001/api/Auth/";
 
             JServerLogin jServerLogin = new JServerLogin() { 
                 username = "IamServer", 
